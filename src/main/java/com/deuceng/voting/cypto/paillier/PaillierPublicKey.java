@@ -2,20 +2,17 @@ package com.deuceng.voting.cypto.paillier;
 
 import java.math.BigInteger;
 import java.security.PublicKey;
-import java.util.Random;
 
 public class PaillierPublicKey implements PublicKey {
   private static final long serialVersionUID = 1L;
   private BigInteger n;
   private BigInteger g;
   private BigInteger n2;
-  private Random random;
 
-  public PaillierPublicKey(BigInteger n, BigInteger g, Random random) {
+  public PaillierPublicKey(BigInteger n, BigInteger g) {
     this.n = n;
     this.g = g;
     this.n2 = n.multiply(n);
-    this.random = random;
   }
 
   public BigInteger getN() {
@@ -32,10 +29,6 @@ public class PaillierPublicKey implements PublicKey {
 
   public BigInteger getN2() {
     return n2;
-  }
-
-  public Random getRandom() {
-    return random;
   }
 
   @Override
