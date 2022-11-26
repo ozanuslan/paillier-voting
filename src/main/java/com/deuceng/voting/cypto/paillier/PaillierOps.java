@@ -61,6 +61,7 @@ final class PaillierOps {
   }
 
   private static BigInteger phi(BigInteger p, BigInteger q) {
+    // phi(n) = (p - 1) * (q - 1)
     return p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
   }
 
