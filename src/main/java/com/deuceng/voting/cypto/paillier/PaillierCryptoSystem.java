@@ -19,7 +19,7 @@ public class PaillierCryptoSystem {
       return PaillierOps.generateKeyPair(bitlength, random);
     } catch (ArithmeticException e) {
       LogUtil.log(LogLevel.ERROR, e.getMessage());
-      return PaillierOps.generateKeyPair(bitlength, random);
+      return generateKeyPair(bitlength);
     }
   }
 
