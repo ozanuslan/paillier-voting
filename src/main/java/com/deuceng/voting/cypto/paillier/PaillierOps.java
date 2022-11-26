@@ -37,4 +37,31 @@ final class PaillierOps {
     // c = c^m mod n^2
     return c.modPow(m, n2);
   }
+
+  public static PaillierKeyPair generateKeyPair(int bitlength, Random random) throws ArithmeticException {
+    // p and q are two large primes of equivalent bitlength, p != q
+    BigInteger p = BigInteger.probablePrime(bitlength / 2, random);
+    BigInteger q = BigInteger.probablePrime(bitlength / 2, random);
+    if (p.equals(q)) {
+      throw new ArithmeticException("p and q are equal");
+    }
+    // n = p * q
+    BigInteger n = p.multiply(q);
+    // g = n + 1
+    BigInteger g = n.add(BigInteger.ONE);
+    // lambda = phi(n)
+    BigInteger lambda = phi(p, q);
+    // mu = phi(n)^-1 mod n
+    try {
+      BigInteger mu = lambda.modInverse(n);
+      return new PaillierKeyPair(new PaillierPublicKey(n, g), new PaillierPrivateKey(lambda, mu));
+    } catch (ArithmeticException e) {
+      throw new ArithmeticException("mu is not invertible");
+    }
+  }
+
+  private static BigInteger phi(BigInteger p, BigInteger q) {
+    return p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
+  }
+
 }

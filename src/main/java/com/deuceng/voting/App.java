@@ -4,22 +4,33 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import com.deuceng.voting.cypto.paillier.PaillierCryptoSystem;
+import com.deuceng.voting.cypto.paillier.PaillierKeyPair;
 
 public class App {
     public static void main(String[] args) throws Exception {
         Random r = new Random();
-        r.setSeed(6);
-        PaillierCryptoSystem paillierCryptoSystem = new PaillierCryptoSystem(r);
-        var keyPair = paillierCryptoSystem.generateKeyPair(128);
-        var encrypted = paillierCryptoSystem.encrypt(BigInteger.valueOf(125), keyPair.getPublicKey());
-        System.out.println("Encrypted=" + encrypted);
-        var decrypted = paillierCryptoSystem.decrypt(encrypted, keyPair.getPrivateKey(), keyPair.getPublicKey());
-        System.out.println("Decrypted=" + decrypted);
-        var added = paillierCryptoSystem.multiply(encrypted, BigInteger.valueOf(2), keyPair.getPublicKey());
-        System.out.println("Added(Encrypted)=" + added);
-        System.out.println(
-                "Doubled=" + paillierCryptoSystem.decrypt(added, keyPair.getPrivateKey(), keyPair.getPublicKey()));
-        System.out.println("Encrypted bit length=" + encrypted.bitLength());
-        System.out.println("PublicKey bit length=" + keyPair.getPublicKey().getBitLength());
+        r.setSeed(1);
+        PaillierCryptoSystem paillier = new PaillierCryptoSystem(r);
+        PaillierKeyPair keyPair = paillier.generateKeyPair(128);
+        BigInteger m = paillier.encrypt(BigInteger.valueOf(0), keyPair.getPublicKey());
+
+        int iter = 1_000_000;
+        BigInteger one = paillier.encrypt(BigInteger.valueOf(1), keyPair.getPublicKey());
+        long start = System.nanoTime();
+        for (int i = 0; i < iter; i++) {
+            m = paillier.add(m, one, keyPair.getPublicKey());
+        }
+        long end = System.nanoTime();
+        System.out.println("Time taken: " + (end - start) / 1_000_000 + "ms");
+        System.out.println("Result: " + paillier.decrypt(m, keyPair.getPrivateKey(), keyPair.getPublicKey()));
+
+        int n = 0;
+        start = System.nanoTime();
+        for (int i = 0; i < iter; i++) {
+            n += 1;
+        }
+        end = System.nanoTime();
+        System.out.println("Time taken: " + (end - start) / 1_000_000 + "ms");
+        System.out.println("Result: " + n);
     }
 }

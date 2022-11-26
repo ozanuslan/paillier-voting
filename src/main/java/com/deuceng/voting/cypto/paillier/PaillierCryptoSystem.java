@@ -3,7 +3,9 @@ package com.deuceng.voting.cypto.paillier;
 import java.math.BigInteger;
 
 import java.util.Random;
-import java.util.logging.Logger;
+
+import com.deuceng.voting.util.LogLevel;
+import com.deuceng.voting.util.LogUtil;
 
 public class PaillierCryptoSystem {
   private Random random;
@@ -13,25 +15,12 @@ public class PaillierCryptoSystem {
   }
 
   public PaillierKeyPair generateKeyPair(int bitlength) {
-    BigInteger p = BigInteger.probablePrime(bitlength / 2, random);
-    BigInteger q = BigInteger.probablePrime(bitlength / 2, random);
-    BigInteger n = p.multiply(q);
-    BigInteger lambda = phi(p, q).divide(p.subtract(BigInteger.ONE).gcd(q.subtract(BigInteger.ONE)));
-    BigInteger g = BigInteger.ZERO;
-    while (g.equals(BigInteger.ZERO)) {
-      g = new BigInteger(n.bitLength(), random);
-    }
     try {
-      BigInteger mu = PaillierOps.L(g.modPow(lambda, n.multiply(n)), n).modInverse(n);
-      return new PaillierKeyPair(new PaillierPublicKey(n, g), new PaillierPrivateKey(lambda, mu));
+      return PaillierOps.generateKeyPair(bitlength, random);
     } catch (ArithmeticException e) {
-      Logger.getGlobal().log(java.util.logging.Level.SEVERE, "mu is not invertible");
-      return generateKeyPair(bitlength);
+      LogUtil.log(LogLevel.ERROR, e.getMessage());
+      return PaillierOps.generateKeyPair(bitlength, random);
     }
-  }
-
-  private static BigInteger phi(BigInteger p, BigInteger q) {
-    return p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
   }
 
   public BigInteger encrypt(BigInteger m, PaillierPublicKey pub) {
