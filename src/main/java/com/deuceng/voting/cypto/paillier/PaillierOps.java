@@ -9,10 +9,10 @@ final class PaillierOps {
 
   public static BigInteger encrypt(BigInteger m, BigInteger n, BigInteger g, BigInteger n2, Random random) {
     // r is a random integer in Z_n and it satisfies 0 < r < n
-    BigInteger r = BigInteger.ZERO;
-    while (r.equals(BigInteger.ZERO)) {
+    BigInteger r;
+    do {
       r = new BigInteger(n.bitLength(), random);
-    }
+    } while (r.equals(BigInteger.ZERO));
 
     // c = g^m * r^n mod n^2
     return g.modPow(m, n2).multiply(r.modPow(n, n2)).mod(n2);
