@@ -28,19 +28,19 @@ import com.deuceng.voting.cypto.paillier.PaillierPublicKey;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-public class BenchmarkDecrypt {
+public class DecryptBenchmark {
   @Param({ "128", "256", "512", "1024", "2048", "4096" })
   private int keyBitLength;
   private static Random random = new Random(1);
-  private static PaillierCryptoSystem paillierCryptoSystem = new PaillierCryptoSystem(random);
-  private static PaillierPublicKey publicKey;
-  private static PaillierPrivateKey privateKey;
-  private static BigInteger plaintext = BigInteger.valueOf(1);
-  private static BigInteger ciphertext;
+  private PaillierCryptoSystem paillierCryptoSystem = new PaillierCryptoSystem(random);
+  private PaillierPublicKey publicKey;
+  private PaillierPrivateKey privateKey;
+  private BigInteger plaintext = BigInteger.valueOf(1);
+  private BigInteger ciphertext;
 
   public static void main(String[] args) throws RunnerException {
     Options opt = new OptionsBuilder()
-        .include(BenchmarkDecrypt.class.getSimpleName())
+        .include(DecryptBenchmark.class.getSimpleName())
         .forks(1)
         .jvmArgs("-Xms4G", "-Xmx4G")
         .warmupMode(WarmupMode.INDI)

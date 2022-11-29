@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Param;
@@ -25,19 +24,18 @@ import com.deuceng.voting.cypto.paillier.PaillierCryptoSystem;
 import com.deuceng.voting.cypto.paillier.PaillierPublicKey;
 
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-public class BenchmarkAdd {
+public class EncryptBenchmark {
   @Param({ "128", "256", "512", "1024", "2048", "4096" })
   private int keyBitLength;
-  private static PaillierCryptoSystem paillierCryptoSystem;
-  private static PaillierPublicKey publicKey;
-  private static BigInteger cipher1;
-  private static BigInteger cipher2;
+  private PaillierCryptoSystem paillierCryptoSystem;
+  private PaillierPublicKey publicKey;
+  private static BigInteger message = BigInteger.valueOf(1);
 
   public static void main(String[] args) throws RunnerException {
     Options opt = new OptionsBuilder()
-        .include(BenchmarkAdd.class.getSimpleName())
+        .include(EncryptBenchmark.class.getSimpleName())
         .forks(1)
         .jvmArgs("-Xms4G", "-Xmx4G")
         .warmupMode(WarmupMode.INDI)
@@ -55,12 +53,10 @@ public class BenchmarkAdd {
     Random random = new Random(1);
     paillierCryptoSystem = new PaillierCryptoSystem(random);
     publicKey = paillierCryptoSystem.generateKeyPair(keyBitLength).getPublicKey();
-    cipher1 = paillierCryptoSystem.encrypt(BigInteger.valueOf(1), publicKey);
-    cipher2 = paillierCryptoSystem.encrypt(BigInteger.valueOf(2), publicKey);
   }
 
   @Benchmark
-  public void add(Blackhole bh) {
-    bh.consume(paillierCryptoSystem.add(cipher1, cipher2, publicKey));
+  public void encrypt(Blackhole bh) {
+    bh.consume(paillierCryptoSystem.encrypt(message, publicKey));
   }
 }
