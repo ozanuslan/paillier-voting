@@ -21,20 +21,4 @@ public class AppTest {
         assertTrue(true);
     }
 
-    @Test
-    public void benchmark() throws Exception {
-        Options options = new OptionsBuilder()
-                .include(this.getClass().getName() + ".*")
-                .mode(Mode.AverageTime)
-                .warmupTime(TimeValue.seconds(1))
-                .warmupIterations(6)
-                .threads(1)
-                .measurementIterations(6)
-                .forks(1)
-                .shouldFailOnError(true)
-                .shouldDoGC(true)
-                .build();
-
-        new Runner(options).run();
-    }
 }
