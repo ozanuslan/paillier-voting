@@ -29,6 +29,6 @@ public class Candidate {
 
   @Override
   public String toString() {
-    return "Candidate [id=" + id + ", name=" + name + ", votes=" + votes + "]";
+    return "Candidate{id=" + id + ", name=" + name + ", votes=" + votes + "}";
   }
 }

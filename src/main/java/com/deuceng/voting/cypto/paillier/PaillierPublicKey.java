@@ -45,4 +45,13 @@ public class PaillierPublicKey implements PublicKey {
   public byte[] getEncoded() {
     return new byte[0];
   }
+
+  @Override
+  public String toString() {
+    return "PaillierPublicKey{" +
+        "n=" + n +
+        ", g=" + g +
+        ", n2=" + n2 +
+        '}';
+  }
 }

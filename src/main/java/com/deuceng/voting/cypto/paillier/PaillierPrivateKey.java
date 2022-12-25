@@ -35,4 +35,12 @@ public class PaillierPrivateKey implements PrivateKey {
   public byte[] getEncoded() {
     return new byte[0];
   }
+
+  @Override
+  public String toString() {
+    return "PaillierPrivateKey{" +
+        "lambda=" + lambda +
+        ", mu=" + mu +
+        '}';
+  }
 }

@@ -39,7 +39,9 @@ public class VotingSystem {
     if (!candidateIdToIndex.containsKey(candidateId)) {
       throw new UnknownCandidateException("candidate = " + candidateId + " is invalid.");
     }
-    return pcs.encrypt(base.pow(getCandidateIndex(candidateId)), keyPair.getPublicKey());
+    var enc = pcs.encrypt(base.pow(getCandidateIndex(candidateId)), keyPair.getPublicKey());
+    System.out.println("Encrypted vote: " + enc);
+    return enc;
   }
 
   private int getCandidateIndex(int candidateId) {

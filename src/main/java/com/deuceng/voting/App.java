@@ -11,29 +11,36 @@ import com.deuceng.voting.system.VotingSystem;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        PaillierKeyPair keyPair = PaillierCryptoSystem.generateKeyPair(1024, new SecureRandom());
+        PaillierKeyPair keyPair = PaillierCryptoSystem.generateKeyPair(16, new SecureRandom());
+        System.out.println("Key pair generated. Bit length: " + 16);
+        System.out.println("Public key: " + keyPair.getPublicKey());
+        System.out.println("Private key: " + keyPair.getPrivateKey());
         List<Candidate> candidates = List.of(
-                new Candidate(4, "A"),
-                new Candidate(3, "B"),
-                new Candidate(2, "C"),
-                new Candidate(1, "D"));
-        VotingSystem vs = new VotingSystem(keyPair, 1234l, candidates, 5l);
+                new Candidate(1, "A"),
+                new Candidate(2, "B"));
+        System.out.println("Candidates: ");
+        for (Candidate c : candidates) {
+            System.out.println(c);
+        }
 
-        vs.addVote(4);
-        vs.addVote(4);
+        VotingSystem vs = new VotingSystem(keyPair, 1l, candidates, 3l);
+        System.out.println("Voting system created. Seed: " + 1l + ", Voter count: " + 3l);
 
-        vs.addVote(3);
-
+        System.out.println("Adding vote for voter 1: candidate 1");
         vs.addVote(1);
-        vs.addVote(1);
+        System.out.println("Adding vote for voter 2: candidate 2");
+        vs.addVote(2);
+        System.out.println("Adding vote for voter 3: candidate 1");
         vs.addVote(1);
 
         var result = vs.tallyVotes();
+        System.out.println("Votes tallied.");
 
         List<Candidate> sorted = result.stream()
                 .sorted((a, b) -> Long.compare(b.getVotes(), a.getVotes()))
                 .collect(Collectors.toList());
 
+        System.out.println("Sorted results: ");
         for (Candidate c : sorted) {
             System.out.println(c);
         }
