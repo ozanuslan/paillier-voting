@@ -23,6 +23,15 @@ public class PaillierCryptoSystem {
     }
   }
 
+  public static PaillierKeyPair generateKeyPair(int bitlength, Random random) {
+    try {
+      return PaillierOps.generateKeyPair(bitlength, random);
+    } catch (ArithmeticException e) {
+      LogUtil.log(LogLevel.ERROR, e.getMessage());
+      return generateKeyPair(bitlength, random);
+    }
+  }
+
   public BigInteger encrypt(BigInteger m, PaillierPublicKey pub) {
     return PaillierOps.encrypt(m, pub.getN(), pub.getG(), pub.getN2(), random);
   }

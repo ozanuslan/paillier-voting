@@ -1,36 +1,41 @@
 package com.deuceng.voting;
 
-import java.math.BigInteger;
-import java.util.Random;
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.deuceng.voting.cypto.paillier.PaillierCryptoSystem;
 import com.deuceng.voting.cypto.paillier.PaillierKeyPair;
+import com.deuceng.voting.system.Candidate;
+import com.deuceng.voting.system.VotingSystem;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        Random r = new Random();
-        r.setSeed(1);
-        PaillierCryptoSystem paillier = new PaillierCryptoSystem(r);
-        PaillierKeyPair keyPair = paillier.generateKeyPair(128);
-        BigInteger m = paillier.encrypt(BigInteger.valueOf(0), keyPair.getPublicKey());
+        PaillierKeyPair keyPair = PaillierCryptoSystem.generateKeyPair(1024, new SecureRandom());
+        List<Candidate> candidates = List.of(
+                new Candidate(4, "A"),
+                new Candidate(3, "B"),
+                new Candidate(2, "C"),
+                new Candidate(1, "D"));
+        VotingSystem vs = new VotingSystem(keyPair, 1234l, candidates, 5l);
 
-        int iter = 1_000_000;
-        BigInteger one = paillier.encrypt(BigInteger.valueOf(1), keyPair.getPublicKey());
-        long start = System.nanoTime();
-        for (int i = 0; i < iter; i++) {
-            m = paillier.add(m, one, keyPair.getPublicKey());
-        }
-        long end = System.nanoTime();
-        System.out.println("Time taken: " + (end - start) / 1_000_000 + "ms");
-        System.out.println("Result: " + paillier.decrypt(m, keyPair.getPrivateKey(), keyPair.getPublicKey()));
+        vs.addVote(4);
+        vs.addVote(4);
 
-        int n = 0;
-        start = System.nanoTime();
-        for (int i = 0; i < iter; i++) {
-            n += 1;
+        vs.addVote(3);
+
+        vs.addVote(1);
+        vs.addVote(1);
+        vs.addVote(1);
+
+        var result = vs.tallyVotes();
+
+        List<Candidate> sorted = result.stream()
+                .sorted((a, b) -> Long.compare(b.getVotes(), a.getVotes()))
+                .collect(Collectors.toList());
+
+        for (Candidate c : sorted) {
+            System.out.println(c);
         }
-        end = System.nanoTime();
-        System.out.println("Time taken: " + (end - start) / 1_000_000 + "ms");
-        System.out.println("Result: " + n);
     }
 }
