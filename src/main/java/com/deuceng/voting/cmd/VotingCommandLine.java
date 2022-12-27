@@ -16,17 +16,17 @@ import com.deuceng.voting.system.VotingSystem;
 public class VotingCommandLine {
   private int keyPairBitLength;
   private long voterCount;
+  private long votesCast;
   private long candidateCount;
   private List<Candidate> candidates;
   private PaillierKeyPair keyPair;
   private long seed;
   private VotingSystem votingSystem;
-  private boolean isVotingComplete;
   private Scanner sc;
   private Random random;
 
   public VotingCommandLine() {
-    this.isVotingComplete = false;
+    this.votesCast = 0;
     sc = new Scanner(System.in);
   }
 
@@ -57,12 +57,12 @@ public class VotingCommandLine {
   private void clearParameters() {
     this.keyPairBitLength = 0;
     this.voterCount = 0;
+    this.votesCast = 0;
     this.candidateCount = 0;
     this.candidates = null;
     this.keyPair = null;
     this.seed = 0;
     this.votingSystem = null;
-    this.isVotingComplete = false;
 
     System.gc();
   }
@@ -184,35 +184,40 @@ public class VotingCommandLine {
   public void displayVotingSystemMenu() {
     System.out.println("\n\nVoting System Menu");
     System.out.println("1. Start Voting Randomly");
-    System.out.println("2. Display Results");
-    System.out.println("3. Display Voting System Parameters");
-    System.out.println("4. Return to Main Menu");
-    System.out.println("5. Exit");
+    System.out.println("2. Cast a Vote");
+    System.out.println("3. Display Results");
+    System.out.println("4. Display Voting System Parameters");
+    System.out.println("5. Return to Main Menu");
+    System.out.println("6. Exit");
 
     System.out.print("Choice: ");
     String choice = sc.nextLine();
     switch (choice) {
       case "1":
-        if (this.isVotingComplete) {
-          System.out.println("Already voted.");
+        if (isVotingComplete()) {
+          System.out.println("Voting already complete.");
+          displayVotingSystemMenu();
         }
         startVotingRandomly();
         break;
       case "2":
-        if (!this.isVotingComplete) {
-          System.out.println("Voting is not complete yet.");
+        if (isVotingComplete()) {
+          System.out.println("Voting already complete.");
           displayVotingSystemMenu();
         }
-        displayResults();
+        castAVote();
         break;
       case "3":
+        displayResults();
+        break;
+      case "4":
         displayVotingSystemParameters();
         displayVotingSystemMenu();
         break;
-      case "4":
+      case "5":
         displayMainMenu();
         break;
-      case "5":
+      case "6":
         System.out.println("Exiting...");
         System.exit(0);
         break;
@@ -222,20 +227,47 @@ public class VotingCommandLine {
     }
   }
 
+  private boolean isVotingComplete() {
+    return this.votesCast == this.voterCount;
+  }
+
+  private void castAVote() {
+    System.out.print("Please enter candidate index[0-" + (this.candidateCount - 1) + "]: ");
+    String candidateIndexString = sc.nextLine();
+    try {
+      int candidateIndex = Integer.parseInt(candidateIndexString);
+      if (candidateIndex < 0 || candidateIndex >= this.candidateCount) {
+        System.out.println("Invalid candidate index.");
+        castAVote();
+      }
+      this.votingSystem.addVote(candidateIndex);
+      this.votesCast++;
+      System.out.println("Vote cast successfully.");
+      displayVotingSystemMenu();
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid candidate index.");
+      castAVote();
+    } catch (UnknownCandidateException e) {
+      System.out.println("Unknown candidate exception occured.");
+      displayVotingSystemMenu();
+    }
+  }
+
   public void startVotingRandomly() {
     System.out.println("\nStarting voting randomly...");
-    for (int i = 0; i < this.voterCount; i++) {
+    long votesToCast = this.voterCount - this.votesCast;
+    for (long i = 0; i < votesToCast; i++) {
       try {
         int candidateIndex = this.random.nextInt((int) this.candidateCount);
         System.out.println("Voter " + i + " voting for: " + this.candidates.get(candidateIndex).getName());
         this.votingSystem.addVote(candidateIndex);
+        this.votesCast++;
       } catch (UnknownCandidateException e) {
         System.out.println("Unknown candidate exception occured.");
         break;
       }
     }
     System.out.println("Voting completed successfully.");
-    this.isVotingComplete = true;
     displayVotingSystemMenu();
   }
 
